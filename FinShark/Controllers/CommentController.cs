@@ -1,8 +1,11 @@
 ﻿using FinShark.Data;
 using FinShark.Dtos.Comment;
+using FinShark.Extensions;
 using FinShark.Interfaces;
 using FinShark.Mappers;
+using FinShark.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinShark.Controllers
@@ -13,12 +16,14 @@ namespace FinShark.Controllers
     {
         private readonly ICommentRepository _commentRepository;
         private readonly IStockRepository _stockRepository;
+        private readonly UserManager<AppUser> _userManager;
         private readonly ApplicationDbContext _context;
-        public CommentController(ICommentRepository commentRepository, ApplicationDbContext context , IStockRepository stockRepository )
+        public CommentController(ICommentRepository commentRepository, ApplicationDbContext context , IStockRepository stockRepository , UserManager<AppUser> userManager)
         {
             _commentRepository = commentRepository;
             _context = context;
             _stockRepository = stockRepository;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -64,7 +69,12 @@ namespace FinShark.Controllers
                 return BadRequest("Stock does not exist");
             }
 
+            var username = User.GetUsername();
+            var appUser = await _userManager.FindByNameAsync(username);
+
+
             var commentModel = commentDto.ToCommentFromCreate(stockId);
+            commentModel.AppUserId = appUser.Id; //AppUserId'yi ekle
             await _commentRepository.CreateAsync(commentModel);
             return CreatedAtAction(nameof(GetById), new { id = commentModel.Id }, commentModel.ToCommentDto()); //Json formatında ekle
             
