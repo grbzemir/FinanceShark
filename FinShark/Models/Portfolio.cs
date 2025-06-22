@@ -1,5 +1,8 @@
-﻿namespace FinShark.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace FinShark.Models
 {
+    [Table("Portfolios")]
     public class Portfolio
     {
         public string AppUserId { get; set; }

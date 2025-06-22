@@ -2,6 +2,7 @@
 
 namespace FinShark.Models
 {
+    [Table("Stocks")]
     public class Stock
     {
         public int Id { get; set; }
