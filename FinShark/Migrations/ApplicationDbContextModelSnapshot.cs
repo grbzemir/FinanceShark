@@ -95,6 +95,10 @@ namespace FinShark.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AppUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -110,6 +114,8 @@ namespace FinShark.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
 
                     b.HasIndex("StockId");
 
@@ -194,13 +200,13 @@ namespace FinShark.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "e9ad91ee-a5f0-4582-8b62-e04b2bd92d7e",
+                            Id = "bba90a40-8164-42dd-b2d1-b50a84ce4b39",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "39dc58c8-4fd6-47a8-ab07-2bb7f06058ee",
+                            Id = "a28a951b-eddf-42ad-b77a-d4508acb9bb8",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -314,9 +320,17 @@ namespace FinShark.Migrations
 
             modelBuilder.Entity("FinShark.Models.Comment", b =>
                 {
+                    b.HasOne("FinShark.Models.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FinShark.Models.Stock", "Stock")
                         .WithMany("Comments")
                         .HasForeignKey("StockId");
+
+                    b.Navigation("AppUser");
 
                     b.Navigation("Stock");
                 });
